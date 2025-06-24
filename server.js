@@ -9,12 +9,15 @@ server.on('connection', (ws) => {
     clients.push(ws);
 
     ws.on('message', (message) => {
+        // Convert Buffer to string
+        const text = message.toString();
         clients.forEach(client => {
-            if(client !== ws && client.readyState === WebSocket.OPEN){
-                client.send(message);
-            }
-        })
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(text);
+        }
+        });
     });
+
 
     ws.on('close', () => {
         clients = clients.filter(client => client )
