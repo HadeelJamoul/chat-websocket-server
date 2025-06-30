@@ -1,27 +1,24 @@
-const WebSocket = require('ws');
-const PORT = process.env.PORT || 10000
+// server.js
+const WebSocket = require("ws");
+const { broadcastMessage } = require("./utils/broadcaster");
 
-const server = new WebSocket.Server({ port: PORT });
+function createWebSocketServer(port = 10000) {
+  const wss = new WebSocket.Server({ port });
 
-let clients = [];
+  console.log(`✅ WebSocket server running on port ${port}`);
 
-server.on('connection', (ws) => {
-    clients.push(ws);
+  wss.on("connection", function connection(ws) {
+    ws.on("message", function incoming(data) {
+      try {
+        const message = data.toString();
+        console.log("Received:", message);
 
-    ws.on('message', (message) => {
-        // Convert Buffer to string
-        const text = message.toString();
-        clients.forEach(client => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(text);
-        }
-        });
+        broadcastMessage(wss, message);
+      } catch (err) {
+        console.error("Failed to handle message:", err);
+      }
     });
+  });
+}
 
-
-    ws.on('close', () => {
-        clients = clients.filter(client => client )
-    })
-});
-
-console.log(`✅ WebSocket server running on port ${PORT}`);
+module.exports = { createWebSocketServer };
