@@ -3,7 +3,7 @@ const WebSocket = require("ws");
 const { broadcastMessage } = require("./utils/broadcaster");
 
 function createWebSocketServer(port = 10000) {
-  const wss = new WebSocket.Server({ port });
+  const wss = new WebSocket.Server({ port: process.env.PORT || 10000 });
 
   console.log(`✅ WebSocket server running on port ${port}`);
 
